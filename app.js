@@ -2,8 +2,13 @@ const fs = require("fs");
 const path = require("path");
 const cheerio = require("cheerio");
 const https = require("https");
+const dayjs = require("dayjs");
 
 const filePath = path.resolve(process.cwd(), "dom.txt"); // 替换为实际的文件路径
+const folderPath = path.resolve(
+  __dirname,
+  `./emoji-${dayjs().format("YYYY-MM-DD-HH")}`
+);
 
 fs.readFile(filePath, "utf8", (err, data) => {
   if (err) {
@@ -47,7 +52,7 @@ function downloadImage(url, filePath) {
 
         fileStream.on("finish", () => {
           fileStream.close();
-        
+
           resolve("图片下载完成。");
         });
       })
@@ -59,13 +64,12 @@ function downloadImage(url, filePath) {
 
 function imgUrlToPath(url) {
   const imageUrl = new URL(url);
-
+  if (!fs.existsSync(folderPath)) {
+    fs.mkdirSync(folderPath, { recursive: true });
+  }
   const imagePath = path.resolve(
-    __dirname,
-    "./emoji",
+    folderPath,
     path.basename(imageUrl.pathname) + ".png"
   );
   return imagePath;
 }
-
-
